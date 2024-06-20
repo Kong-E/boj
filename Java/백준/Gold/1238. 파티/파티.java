@@ -36,16 +36,16 @@ public class Main {
         }
 
         int[][] startDist = new int[N + 1][N + 1]; // 각 정점에서 X로 가는 최단거리
-        int[][] endDist = new int[N + 1][N + 1]; // X에서 출발하여 각 정점까지 도착하는 최단거리
+        int[] endDist = new int[N + 1]; // X에서 출발하여 각 정점까지 도착하는 최단거리
 
         for (int i = 1; i <= N; i++) {
             Arrays.fill(startDist[i], Integer.MAX_VALUE);
-            Arrays.fill(endDist[i], Integer.MAX_VALUE);
         }
+        Arrays.fill(endDist, Integer.MAX_VALUE);
 
         // 각 정점에서 X로 가기
         for (int i = 1; i <= N; i++) {
-            dijkstra(startDist, graph, i);
+            dijkstra(startDist[i], graph, i);
         }
 
         // X에서 출발하여 각 정점까지의 최단거리 구하기
@@ -53,28 +53,28 @@ public class Main {
 
         int max = Integer.MIN_VALUE;
         for (int i = 1; i <= N; i++) {
-            int sum = startDist[i][X] + endDist[X][i];
+            int sum = startDist[i][X] + endDist[i];
             if (max < sum) max = sum;
         }
 
         System.out.println(max);
     }
 
-    static void dijkstra(int[][] dist, ArrayList<ArrayList<Node>> graph, int startNode) {
+    static void dijkstra(int[] dist, ArrayList<ArrayList<Node>> graph, int startNode) {
         PriorityQueue<Node> pq = new PriorityQueue<>((o1, o2) -> o1.dist - o2.dist);
         pq.offer(new Node(startNode, 0));
-        dist[startNode][startNode] = 0;
+        dist[startNode] = 0;
 
         while (!pq.isEmpty()) {
             Node curNode = pq.poll();
 
-            if (dist[startNode][curNode.vertex] < curNode.dist) continue;
+            if (dist[curNode.vertex] < curNode.dist) continue;
 
             for (Node adjNode : graph.get(curNode.vertex)) {
                 int newDist = curNode.dist + adjNode.dist;
-                if (dist[startNode][adjNode.vertex] > newDist) {
-                    dist[startNode][adjNode.vertex] = newDist;
-                    pq.offer(new Node(adjNode.vertex, dist[startNode][adjNode.vertex]));
+                if (dist[adjNode.vertex] > newDist) {
+                    dist[adjNode.vertex] = newDist;
+                    pq.offer(new Node(adjNode.vertex, dist[adjNode.vertex]));
                 }
             }
         }
