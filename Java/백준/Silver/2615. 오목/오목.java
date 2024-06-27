@@ -18,7 +18,12 @@ public class Main {
             }
         }
 
-        boolean found = false;
+        boolean found = find(board);
+
+        if (!found) System.out.println(0);
+    }
+
+    static boolean find(int[][] board) {
         for (int y = 0; y < 19; y++) {
             for (int x = 0; x < 19; x++) {
                 int current = board[y][x];
@@ -27,6 +32,7 @@ public class Main {
                         int nx = x;
                         int ny = y;
                         int count = 1;
+                        
                         while (true) {
                             nx += dx[i];
                             ny += dy[i];
@@ -48,23 +54,16 @@ public class Main {
                                 if (isFrontSixX >= 0 && isFrontSixX < 19 && isFrontSixY >= 0 && isFrontSixY < 19 && board[isFrontSixY][isFrontSixX] == current) {
                                     break;
                                 }
-//                                System.out.println("현재방향: " + "(" + dx[i] + ", " + dy[i] + ")");
-//                                System.out.println("원래위치: " + "(" + (originX+1) + ", " + (originY+1) + ")");
                                 System.out.println(current);
                                 System.out.print((y + 1) + " ");
                                 System.out.print((x + 1));
-                                found = true;
-                                break;
+                                return true;
                             }
                         }
-                        if (found) break;;
                     }
                 }
-                if (found) break;;
             }
-            if (found) break;
         }
-
-        if (!found) System.out.println(0);
+        return false;
     }
 }
