@@ -52,16 +52,6 @@ public class Main {
                 break;
             }
 
-            for (int i = 0; i < 4; i++) {
-                int nx = curNode.x + dx[i];
-                int ny = curNode.y + dy[i];
-
-                if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
-                if (board[ny][nx] != 1 && !visited[ny][nx][curNode.k]) {
-                    q.offer(new Node(nx, ny, curNode.count + 1, curNode.k));
-                    visited[ny][nx][curNode.k] = true;
-                }
-            }
             if (curNode.k > 0) {
                 for (int i = 0; i < 8; i++) {
                     int nx = curNode.x + cdx[i];
@@ -72,6 +62,16 @@ public class Main {
                         q.offer(new Node(nx, ny, curNode.count + 1, curNode.k - 1));
                         visited[ny][nx][curNode.k - 1] = true;
                     }
+                }
+            }
+            for (int i = 0; i < 4; i++) {
+                int nx = curNode.x + dx[i];
+                int ny = curNode.y + dy[i];
+
+                if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+                if (board[ny][nx] != 1 && !visited[ny][nx][curNode.k]) {
+                    q.offer(new Node(nx, ny, curNode.count + 1, curNode.k));
+                    visited[ny][nx][curNode.k] = true;
                 }
             }
 
