@@ -2,12 +2,6 @@ import java.io.*;
 import java.util.*;
 
 class Solution {
-//    public static void main(String[] args) throws IOException {
-//        int answer = solution(new String[] {"a", "b", "c"},
-//                new String[] {"a b", "b a", "c a", "a c", "a c", "c a"});
-//
-//        System.out.println(answer);
-//    }
     static class Person {
         String name;
         Map<String, Integer> receive = new HashMap<>(); // 받은 선물의 수
@@ -35,8 +29,6 @@ class Solution {
         Map<String, Person> map = new HashMap<>();
         Map<String, Integer> giftMap = new HashMap<>();
 
-        //gifts로 각각의 receive와 send를 계산한 다음
-        //사람 객체를 어떻게 저장하지?
         for (int i = 0; i < gifts.length; i++) {
             st = new StringTokenizer(gifts[i]);
             String sender = st.nextToken();
@@ -49,9 +41,7 @@ class Solution {
             map.put(receiver, receiverObj);
         }
 
-        //Map에 다음 달 선물 개수 저장
-        //어떻게?
-        //calculateScore를 각각 돌려서 더 크면 map.put(map.getOrDefault(사람이름, 0) + 1);
+        int ans = 0;
         for (int i = 0; i < friends.length; i++) {
             for (int j = i + 1; j < friends.length; j++) {
                 Person one = map.getOrDefault(friends[i], new Person(friends[i]));
@@ -60,12 +50,12 @@ class Solution {
                 Map<String, Integer> twoReceive = two.receive;
                 if (oneReceive.containsKey(friends[j])
                         || twoReceive.containsKey(friends[i])) {
-                    int oneSend = twoReceive.getOrDefault(friends[i], 0);
-                    int twoSend = oneReceive.getOrDefault(friends[j], 0);
-                    if (oneSend > twoSend) {
+                    if (oneReceive.getOrDefault(friends[j], 0) 
+                        < twoReceive.getOrDefault(friends[i], 0)) {
                         giftMap.put(friends[i], giftMap.getOrDefault(friends[i], 0) + 1);
                     }
-                    if (oneSend < twoSend) {
+                    if (oneReceive.getOrDefault(friends[j], 0) 
+                        > twoReceive.getOrDefault(friends[i], 0)) {
                         giftMap.put(friends[j], giftMap.getOrDefault(friends[j], 0) + 1);
                     }
                 }
@@ -81,13 +71,12 @@ class Solution {
                         giftMap.put(friends[j], giftMap.getOrDefault(friends[j], 0) + 1);
                     }
                 }
+                ans = Math.max(Math.max(giftMap.getOrDefault(friends[i], 0), 
+                                        giftMap.getOrDefault(friends[j],0)), 
+                               ans);
             }
         }
 
-        List<Map.Entry<String, Integer>> list = new ArrayList<>(giftMap.entrySet());
-
-        list.sort(Map.Entry.comparingByValue());
-
-        return list.isEmpty() ? 0 : list.get(list.size() - 1).getValue();
+        return ans;
     }
 }
