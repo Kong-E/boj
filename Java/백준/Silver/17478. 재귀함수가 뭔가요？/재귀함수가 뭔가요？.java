@@ -3,6 +3,8 @@ import java.util.*;
 
 public class Main {
     static int N;
+    static String[] strs = {"\"재귀함수가 뭔가요?\"\n", "\"잘 들어보게. 옛날옛날 한 산 꼭대기에 이세상 모든 지식을 통달한 선인이 있었어.\n",
+            "마을 사람들은 모두 그 선인에게 수많은 질문을 했고, 모두 지혜롭게 대답해 주었지.\n", "그의 답은 대부분 옳았다고 하네. 그런데 어느 날, 그 선인에게 한 선비가 찾아와서 물었어.\"\n"};
     static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
@@ -28,17 +30,10 @@ public class Main {
             return;
         }
 
-        appenUnderbar(n);
-        sb.append("\"재귀함수가 뭔가요?\"\n");
-
-        appenUnderbar(n);
-        sb.append("\"잘 들어보게. 옛날옛날 한 산 꼭대기에 이세상 모든 지식을 통달한 선인이 있었어.\n");
-
-        appenUnderbar(n);
-        sb.append("마을 사람들은 모두 그 선인에게 수많은 질문을 했고, 모두 지혜롭게 대답해 주었지.\n");
-
-        appenUnderbar(n);
-        sb.append("그의 답은 대부분 옳았다고 하네. 그런데 어느 날, 그 선인에게 한 선비가 찾아와서 물었어.\"\n");
+        for (String str : strs) {
+            appenUnderbar(n);
+            sb.append(str);
+        }
 
         recursion(n - 1);
 
