@@ -1,88 +1,68 @@
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
-class Node {
-    String data;
-    Node left;
-    Node right;
+class Main {
+    static StringBuilder sb = new StringBuilder();
+    static class Node {
+        String key;
+        String left;
+        String right;
 
-    Node(String data) {
-        this.data = data;
-    }
-}
-
-class Tree {
-    Node root;
-
-    void insert(String data, String leftData, String rightData) {
-        if (root == null) {
-            root = new Node(data);
-            if (!leftData.equals(".")) root.left = new Node(leftData);
-            if (!rightData.equals(".")) root.right = new Node(rightData);
-        } else {
-            insertNode(root, data, leftData, rightData);
+        Node(String key) {
+            this.key = key;
         }
     }
 
-    void insertNode(Node node, String data, String leftData, String rightData) {
-        if (node.data.equals(data)) {
-            if (!leftData.equals(".")) node.left = new Node(leftData);
-            if (!rightData.equals(".")) node.right = new Node(rightData);
-        } else {
-            if (node.left != null) insertNode(node.left, data, leftData, rightData);
-            if (node.right != null) insertNode(node.right, data, leftData, rightData);
-        }
-    }
-
-    void preorder(Node root) {
-        if (root != null) {
-            System.out.print(root.data);
-            preorder(root.left);
-            preorder(root.right);
-        }
-    }
-
-    void inorder(Node root) {
-        if (root != null) {
-            inorder(root.left);
-            System.out.print(root.data);
-            inorder(root.right);
-        }
-    }
-
-    void postorder(Node root) {
-        if (root != null) {
-            postorder(root.left);
-            postorder(root.right);
-            System.out.print(root.data);
-        }
-    }
-}
-
-public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
+        Map<String, Node> map = new HashMap<>();
 
         int n = Integer.parseInt(br.readLine());
-        Tree tree = new Tree();
 
+        StringTokenizer st;
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             String root = st.nextToken();
             String left = st.nextToken();
             String right = st.nextToken();
 
-            tree.insert(root, left, right);
+            Node rootNode = new Node(root);
+            if(!left.equals(".")) rootNode.left = left;
+            if(!right.equals(".")) rootNode.right = right;
+
+            map.put(root, rootNode);
         }
 
-        tree.preorder(tree.root);
-        System.out.println();
-        tree.inorder(tree.root);
-        System.out.println();
-        tree.postorder(tree.root);
+        recursion("preorder", map, "A");
+        sb.append("\n");
+        recursion("inorder", map, "A");
+        sb.append("\n");
+        recursion("postorder", map, "A");
+
+        System.out.println(sb.toString());
+    }
+
+    static void recursion(String order, Map<String, Node> map, String root) {
+        String left = map.get(root).left;
+        String right = map.get(root).right;
+
+        if (order.equals("preorder")) {
+            sb.append(root);
+            if (left != null) recursion(order, map, left);
+            if (right != null) recursion(order, map, right);
+        }
+        if (order.equals("inorder")) {
+            if (left != null) recursion(order, map, left);
+            sb.append(root);
+            if (right != null) recursion(order, map, right);
+        }
+        if (order.equals("postorder")) {
+            if (left != null) recursion(order, map, left);
+            if (right != null) recursion(order, map, right);
+            sb.append(root);
+        }
     }
 }
