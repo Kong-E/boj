@@ -18,13 +18,6 @@ class Solution {
                 
                 left = current;
                 right = left + m - 1;
-                
-                if (right > n) {
-                    diff = right - n;
-                    
-                    left -= diff;
-                    right -= diff;
-                }
             }
         }
         
