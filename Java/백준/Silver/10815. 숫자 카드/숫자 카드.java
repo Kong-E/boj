@@ -1,4 +1,3 @@
-
 import java.io.*;
 import java.util.*;
 
@@ -24,7 +23,7 @@ public class Main {
         int target;
         for (int i = 0; i < m; i++) {
             target = Integer.parseInt(st.nextToken());
-            if (Arrays.binarySearch(ns, target) >= 0) {
+            if (binarySearch(ns, target)) {
                 sb.append(1 + " ");
             } else {
                 sb.append(0 + " ");
@@ -32,5 +31,25 @@ public class Main {
         }
 
         System.out.println(sb.toString());
+    }
+
+    static boolean binarySearch(int[] ns, int target) {
+        int start = 0;
+        int end = ns.length - 1;
+        int mid;
+        while (start <= end) {
+            mid = (start + end) / 2;
+
+            if (ns[mid] > target) {
+                // end를 더 작게
+                end = mid - 1;
+            } else if (ns[mid] < target) {
+                // start를 더 크게
+                start = mid + 1;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 }
