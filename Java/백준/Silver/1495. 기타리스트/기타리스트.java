@@ -11,7 +11,7 @@ public class Main {
         int s = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
 
-        boolean[][] dp = new boolean[n + 1][1001];
+        boolean[][] dp = new boolean[n + 1][m + 1];
 
         dp[0][s] = true;
         int max = -1;
@@ -19,7 +19,7 @@ public class Main {
         int num;
         for (int i = 1; i <= n; i++) {
             num = Integer.parseInt(st.nextToken());
-            for (int j = 0; j <= 1000; j++) {
+            for (int j = 0; j <= m; j++) {
                 if (dp[i - 1][j]) {
                     if (j + num <= m) {
                         dp[i][j + num] = true;
