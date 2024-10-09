@@ -1,43 +1,20 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int[] dx = {0, -1, 0, 1};
-    static int[] dy = {-1, 0, 1, 0};
-    static int[][] board;
-    static int n;
-
-    static class BabyShark {
-        int x;
-        int y;
-        int size = 2; // 아기 상어의 크기
-        int count = 0; // 먹은 물고기의 수
-
-        BabyShark(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        void ate() {
-            if (++count == size) {
-                size++;
-                count = 0;
-            }
-        }
-    }
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
-        n = Integer.parseInt(br.readLine());
+        int n = Integer.parseInt(br.readLine());
 
-        board = new int[n][n];
+        int[][] board = new int[n][n];
         int status; // 공간의 상태
-        BabyShark shark = null;
+        int[] start = new int[3]; // x, y, dist
 
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
@@ -46,25 +23,19 @@ public class Main {
                 board[i][j] = status;
 
                 if (status == 9) {
-                    shark = new BabyShark(j, i);
-                    board[i][j] = 0;
+                    start = new int[] {j, i, 0};
                 }
             }
         }
 
-        int distance = 0; 
-        int total = 0; // 총 최단거리
-        while (true) {
-            distance = eatFish(shark);
-            if (distance == 0) break;
-            total += distance;
-        }
-
-        System.out.println(total);
+        System.out.println(bfs(board, n, start));
     }
 
-    static int eatFish(BabyShark shark) {
-        Queue<int[]> q = new PriorityQueue<>((o1, o2) -> {
+    static int bfs(int[][] board, int n, int[] start) {
+        int[] dx = {0, -1, 0, 1};
+        int[] dy = {-1, 0, 1, 0};
+
+        PriorityQueue<int[]> q = new PriorityQueue<>((o1, o2) -> {
             if (o1[2] == o2[2]) {
                 if (o1[1] == o2[1]) {
                     return o1[0] - o2[0];
@@ -73,25 +44,35 @@ public class Main {
             }
             return o1[2] - o2[2];
         });
-
         boolean[][] visited = new boolean[n][n];
-        visited[shark.y][shark.x] = true;
-        q.offer(new int[] {shark.x, shark.y, 0}); // 상어 x, 상어 y, 현재 거리
+        visited[start[1]][start[0]] = true;
+        board[start[1]][start[0]] = 0;
+        q.offer(start);
 
+        int distance = 0; // 총 최단거리
+        int size = 2; // 처음 아기 상어의 크기는 2
+
+        int ate = 0; // 먹은 물고기 수
         int[] pop;
-        int x, y, count, nx, ny;
+        int x, y, count;
+        int nx, ny;
         while (!q.isEmpty()) {
             pop = q.poll();
             x = pop[0];
             y = pop[1];
             count = pop[2];
 
-            if (board[y][x] < shark.size && board[y][x] > 0) {
+            if (board[y][x] < size && board[y][x] > 0) {
+                distance += count;
+                if (++ate == size) {
+                    ate = 0;
+                    size++;
+                }
                 board[y][x] = 0;
-                shark.ate();
-                shark.x = x;
-                shark.y = y;
-                return count;
+                count = 0;
+                visited = new boolean[n][n];
+                visited[y][x] = true;
+                q.clear();
             }
 
             for (int i = 0; i < 4; i++) {
@@ -99,12 +80,12 @@ public class Main {
                 ny = y + dy[i];
 
                 if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-                if (!visited[ny][nx] && board[ny][nx] <= shark.size) {
+                if (!visited[ny][nx] && board[ny][nx] <= size) {
                     q.offer(new int[] {nx, ny, count + 1});
                     visited[ny][nx] = true;
                 }
             }
         }
-        return 0;
+        return distance;
     }
 }
