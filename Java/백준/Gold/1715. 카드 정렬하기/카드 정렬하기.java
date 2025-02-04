@@ -17,11 +17,15 @@ public class Main {
         }
 
         int sum = 0;
-        while (pq.size() > 1) {
-            int poll1 = pq.poll();
-            int poll2 = pq.poll();
-            int mix = poll1 + poll2;
-            pq.offer(mix);
+        while (!pq.isEmpty() && n != 1) {
+            int mix = pq.poll();
+            if (!pq.isEmpty()) {
+                int poll = pq.poll();
+                mix += poll;
+                if (!pq.isEmpty()) {
+                    pq.offer(mix);
+                }
+            }
             sum += mix;
         }
 
