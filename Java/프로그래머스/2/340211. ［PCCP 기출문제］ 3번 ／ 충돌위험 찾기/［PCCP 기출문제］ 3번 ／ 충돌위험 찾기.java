@@ -1,92 +1,86 @@
 import java.util.*;
 
-// point들에 번호 매기기
-// 큐에 각 route들의 첫 번째 요소들 집어 넣기(첫 번째 요소의 목적지 필드도 설정)
-// 큐에서 현재 size만큼의 하나의 로테이션을 돌기
-// 로테이션을 돌면서 좌표별 방문 횟수 카운트 하기
-// 다음 로테이션을 위해 큐에 이동한 포인트 집어 넣기
-
 class Solution {
-    public int solution(int[][] points, int[][] routes) {
-        Queue<Point> q = new ArrayDeque<>();
-        Map<Integer, Point> pointMap = new HashMap<>(); 
-        int result = 0;
-
-        // point들에 번호 매기기
-        for (int i = 0; i < points.length; i++) {
-            pointMap.put(i + 1, new Point(points[i][0], points[i][1]));
+    static class Position {
+        int r, c, time;
+        
+        Position(int r, int c, int time) {
+            this.r = r;
+            this.c = c;
+            this.time = time;
         }
         
-        // 큐에 각 route들의 첫 번째 요소들 집어 넣기
-        for (int[] route : routes) {
-            Point point = pointMap.get(route[0]);
-            Point newPoint = new Point(point.r, point.c);
-            int[][] destination = new int[route.length - 1][2];
-            for (int i = 0; i < route.length - 1; i++) {
-                Point destPoint = pointMap.get(route[i + 1]);
-                destination[i][0] = destPoint.r;
-                destination[i][1] = destPoint.c;
-            }
-            newPoint.destination = destination;
-            q.add(newPoint);
+        @Override
+        public String toString() {
+            return time + "(" + r + "," + c + ")";
         }
-                
-        while (!q.isEmpty()) {
-            int size = q.size();
+    }
+    
+    public int solution(int[][] points, int[][] routes) {
+        // 포인트 번호 -> 좌표 매핑
+        Map<Integer, int[]> pointMap = new HashMap<>();
+        for (int i = 0; i < points.length; i++) {
+            pointMap.put(i + 1, points[i]);
+        }
+        
+        // 시간별 위치에 있는 로봇 수를 기록
+        Map<String, Integer> collisionMap = new HashMap<>();
+        
+        // 각 로봇의 경로를 시뮬레이션
+        for (int robotId = 0; robotId < routes.length; robotId++) {
+            List<Position> path = new ArrayList<>();
             
-            // 같은 로테이션일 때 카운트가 2이상인 경우를 세어야하니까 시작 부분에서 map 초기화
-            Map<String, Integer> countMap = new HashMap<>();    
-            
-            for (int i = 0; i < size; i++) {
-                Point remove = q.remove();
-                String point = remove.r + ", " + remove.c;
-                countMap.put(point, countMap.getOrDefault(point, 0) + 1);
+            // 각 경로 구간별로 이동 경로 계산
+            for (int i = 0; i < routes[robotId].length - 1; i++) {
+                int[] start = pointMap.get(routes[robotId][i]);
+                int[] end = pointMap.get(routes[robotId][i + 1]);
                 
-                int[] destination = remove.destination[remove.index];
-                if (destination[0] == remove.r && destination[1] == remove.c) {
-                    if (remove.index < remove.destination.length - 1) {
-                        remove.index++;
-                        destination = remove.destination[remove.index];
-                    } else {
-                        continue;
-                    }
-                }
-                
-                if (remove.r != destination[0]) {
-                    if (remove.r < destination[0]) {
-                        remove.r++;
-                    } else {
-                        remove.r--;
-                    }
-                } else if (remove.c != destination[1]) {
-                    if (remove.c < destination[1]) {
-                        remove.c++;
-                    } else {
-                        remove.c--;
-                    }
-                }
-                
-                q.add(remove);
+                int startTime = path.isEmpty() ? 0 : path.get(path.size() - 1).time + 1;
+                List<Position> segment = getPath(start[0], start[1], end[0], end[1], startTime);
+                path.addAll(segment);
             }
             
-            for (int value : countMap.values()) {
-                if (value >= 2) result++;
+            // 마지막 위치 추가
+            if (!path.isEmpty()) {
+                int[] lastPoint = pointMap.get(routes[robotId][routes[robotId].length - 1]);
+                path.add(new Position(lastPoint[0], lastPoint[1], path.get(path.size() - 1).time + 1));
+            }
+            
+            // 경로의 각 위치를 collision map에 기록
+            for (Position pos : path) {
+                String key = pos.toString();
+                collisionMap.put(key, collisionMap.getOrDefault(key, 0) + 1);
             }
         }
-
-        return result;
+        
+        // 충돌 횟수 계산
+        int answer = 0;
+        for (int count : collisionMap.values()) {
+            if (count > 1) answer++;
+        }
+        
+        return answer;
+    }
+    
+    // 두 점 사이의 경로를 반환하는 메서드
+    private List<Position> getPath(int startR, int startC, int endR, int endC, int startTime) {
+        List<Position> path = new ArrayList<>();
+        int currentR = startR;
+        int currentC = startC;
+        int time = startTime;
+        
+        // r 좌표 이동
+        while (currentR != endR) {
+            path.add(new Position(currentR, currentC, time++));
+            currentR += (endR > currentR) ? 1 : -1;
+        }
+        
+        // c 좌표 이동
+        while (currentC != endC) {
+            path.add(new Position(currentR, currentC, time++));
+            currentC += (endC > currentC) ? 1 : -1;
+        }
+        
+        return path;
     }
 }
-
-class Point {
-    int r;
-    int c;
-    int[][] destination;
-    int index = 0; // 다음 목적지 인덱스
-
-    public Point(int r, int c) {
-        this.r = r;
-        this.c = c;
-    }
-}
-
